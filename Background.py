@@ -60,7 +60,7 @@ class Connection(QObject):
         def worker():
             if session:
                 if session.is_connected():
-                    self.add_text.emit((QString), "\nStarting new channel ...\n")
+                    self.add_text.emit(QString("\nStarting new channel ...\n"))
                     channel = session.open_channel()
                     if channel:
                         self.set_channel(channel)
