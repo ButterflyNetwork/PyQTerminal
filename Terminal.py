@@ -13,6 +13,7 @@ class QTerminal(QTextEdit):
     MAX_HISTORY = 100  # Maximum history is 100 lines
     SCREEN_HEIGHT = 24
     SCREEN_WIDTH = 80
+    FONT_NAME = "Lucida Console"
     FG_COLOR = QColor(100, 100, 100)
     BG_COLOR = QColor(255, 255, 255)
     SELECT_FG_COLOR = QColor(255, 255, 255)
@@ -37,7 +38,7 @@ class QTerminal(QTextEdit):
         # Update the GUI
         self._application_cursor_mode = False
         self._application_keypad_mode = False
-        self.font = QFont("Lucida Console", 10)
+        self.font = QFont(self.FONT_NAME, 10)
         self.setFont(self.font)
         self.document().setMaximumBlockCount(self.MAX_OUTPUT)
         self.setCurrentCharFormat(self.default_text_format())    # Reset the text format
