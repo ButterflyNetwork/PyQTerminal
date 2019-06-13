@@ -2,8 +2,8 @@ from PyQt5.QtGui import QTextCursor, QFont, QTextCharFormat, QFontMetrics, QColo
 #from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtCore import QTimer, Qt, QCoreApplication, pyqtSignal
-from Background import Connection
-from ControlSequence import *
+from .Background import Connection
+from .ControlSequence import *
 from re import match, sub, findall, finditer
 
 
