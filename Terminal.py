@@ -19,13 +19,13 @@ class QTerminal(QTextEdit):
     SELECT_FG_COLOR = QColor(255, 255, 255)
     SELECT_BG_COLOR = QColor(40, 90, 240)
 
-    def __init__(self, master=None, session=None):
+    def __init__(self, master=None, session=None, connection=None):
         super(QTerminal, self).__init__(master)
         self.master = master
 
         # Define the connection
         self._session = session
-        self._connection = Connection()
+        self._connection = Connection() if connection is None else connection
         if self._session:
             self._connection.set_session(self._session)
             self._connection.start_connection()
