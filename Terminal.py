@@ -233,7 +233,6 @@ class QTerminal(QTextEdit):
                 self.setTextCursor(cursor)
 
     def add_received_text(self, data):
-        print(repr(data))
         if ESC in data:
             # Slice the data with Escape
             new_data_list = [ESC + d for d in data.split(ESC)]
