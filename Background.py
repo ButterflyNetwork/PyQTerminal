@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject,pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 from threading import Thread
 from time import sleep
 from _socket import error
@@ -10,12 +10,13 @@ except NameError:
     # Python 3
     QString = str
 
+
 class Connection(QObject):
     clear_all = pyqtSignal()
     reset_timer = pyqtSignal()
     add_text = pyqtSignal('QString')
     stop_timer = pyqtSignal()
-    DATA_READ_INT = 0.1                  # Read data every 0.5 [s]
+    DATA_READ_INT = 0.1  # Read data every 0.5 [s]
 
     def __init__(self):
         super(Connection, self).__init__()
@@ -132,8 +133,8 @@ class Connection(QObject):
 
 
 class Session:
-    SESSIONS_COUNT = 0     # Number of opened sessions
-    MAX_CHANNELS = 10      # Maximum number of opened channels per session
+    SESSIONS_COUNT = 0  # Number of opened sessions
+    MAX_CHANNELS = 10  # Maximum number of opened channels per session
 
     def __init__(self):
         """

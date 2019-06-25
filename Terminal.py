@@ -8,7 +8,7 @@ from re import match, sub, findall, finditer
 
 
 class QTerminal(QTextEdit):
-    TIMEOUT = 60       # Timeout after 60 [s]
+    TIMEOUT = 60  # Timeout after 60 [s]
     MAX_OUTPUT = 1000  # Maximum output is 1000 lines
     MAX_HISTORY = 100  # Maximum history is 100 lines
     SCREEN_HEIGHT = 24
@@ -41,7 +41,7 @@ class QTerminal(QTextEdit):
         self.font = QFont(self.FONT_NAME, 10)
         self.setFont(self.font)
         self.document().setMaximumBlockCount(self.MAX_OUTPUT)
-        self.setCurrentCharFormat(self.default_text_format())    # Reset the text format
+        self.setCurrentCharFormat(self.default_text_format())  # Reset the text format
         self.set_title('Terminal')
         self._selection_cursor = self.textCursor()
         self._select_cursor_format = self.currentCharFormat()
@@ -79,13 +79,15 @@ class QTerminal(QTextEdit):
 
     def resizeEvent(self, event):
         frame_format = self.document().rootFrame().frameFormat()
-        frame_format.setBottomMargin(self.viewport().height() - QFontMetrics(self.document().defaultFont()).height() - 2)
+        frame_format.setBottomMargin(self.viewport().height() - QFontMetrics(
+            self.document().defaultFont()).height() - 2)
         self.document().rootFrame().setFrameFormat(frame_format)
         return QTextEdit.resizeEvent(self, event)
 
     def focusInEvent(self, event):
         if self._connection:
-            self._connection.set_reading_interval(Connection.DATA_READ_INT)    # Reset the data reading interval
+            self._connection.set_reading_interval(
+                Connection.DATA_READ_INT)  # Reset the data reading interval
         return QTextEdit.focusInEvent(self, event)
 
     def focusOutEvent(self, event):
@@ -101,7 +103,8 @@ class QTerminal(QTextEdit):
 
         elif event.button() == Qt.LeftButton:
             self._clear_cursor_selection()
-            self._selection_cursor.setPosition(self.cursorForPosition(event.pos()).position(), QTextCursor.MoveAnchor)
+            self._selection_cursor.setPosition(
+                self.cursorForPosition(event.pos()).position(), QTextCursor.MoveAnchor)
             return
 
         elif event.button() == Qt.RightButton:
@@ -115,7 +118,8 @@ class QTerminal(QTextEdit):
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self._clear_cursor_selection()
-            self._selection_cursor.movePosition(self.cursorForPosition(event.pos()).StartOfWord, QTextCursor.MoveAnchor)
+            self._selection_cursor.movePosition(
+                self.cursorForPosition(event.pos()).StartOfWord, QTextCursor.MoveAnchor)
             self._selection_cursor.movePosition(QTextCursor.EndOfWord, QTextCursor.KeepAnchor)
             self._selection_cursor.setCharFormat(self._select_cursor_format)
             if self._selection_cursor.hasSelection:
@@ -125,7 +129,8 @@ class QTerminal(QTextEdit):
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
             self._selection_cursor.setCharFormat(self._deselect_cursor_format)
-            self._selection_cursor.setPosition(self.cursorForPosition(event.pos()).position(), QTextCursor.KeepAnchor)
+            self._selection_cursor.setPosition(
+                self.cursorForPosition(event.pos()).position(), QTextCursor.KeepAnchor)
             self._selection_cursor.setCharFormat(self._select_cursor_format)
             if self._selection_cursor.hasSelection:
                 self._clipboard.setText(self._selection_cursor.selectedText())
@@ -138,21 +143,22 @@ class QTerminal(QTextEdit):
 
     def keyPressEvent(self, event):
         if event.modifiers() == Qt.NoModifier:
-            if event.key() == Qt.Key_Up:          # Move cursor up
+            if event.key() == Qt.Key_Up:  # Move cursor up
                 text = (SS3 if self._application_cursor_mode else CSI) + 'A'
-            elif event.key() == Qt.Key_Down:      # Move cursor down
+            elif event.key() == Qt.Key_Down:  # Move cursor down
                 text = (SS3 if self._application_cursor_mode else CSI) + 'B'
-            elif event.key() == Qt.Key_Right:     # Move cursor right
+            elif event.key() == Qt.Key_Right:  # Move cursor right
                 text = (SS3 if self._application_cursor_mode else CSI) + 'C'
-            elif event.key() == Qt.Key_Left:      # Move cursor left
+            elif event.key() == Qt.Key_Left:  # Move cursor left
                 text = (SS3 if self._application_cursor_mode else CSI) + 'D'
-            elif event.key() == Qt.Key_Return:    # Move cursor to end of line then send command
+            elif event.key() == Qt.Key_Return:  # Move cursor to end of line then send command
                 cursor = self.textCursor()
                 cursor.movePosition(QTextCursor.EndOfLine, QTextCursor.MoveAnchor)
                 cursor.setCharFormat(self.currentCharFormat())
                 self.setTextCursor(cursor)
                 text = event.text()
-            elif event.key() == Qt.Key_Escape:    # Read data in buffer - Send "End Of Transmission" (same as CRTL + D)
+            elif event.key(
+            ) == Qt.Key_Escape:  # Read data in buffer - Send "End Of Transmission" (same as CRTL + D)
                 # text = EOT
                 text = event.text()
             else:
@@ -162,26 +168,26 @@ class QTerminal(QTextEdit):
             return
 
         elif event.modifiers() == Qt.ControlModifier:
-            if event.key() == Qt.Key_A:           # Select All
+            if event.key() == Qt.Key_A:  # Select All
                 self._clear_cursor_selection()
                 self._selection_cursor.movePosition(QTextCursor.Start, QTextCursor.MoveAnchor)
                 self._selection_cursor.movePosition(QTextCursor.End, QTextCursor.KeepAnchor)
                 self._selection_cursor.setCharFormat(self._select_cursor_format)
                 if self._selection_cursor.hasSelection:
                     self._clipboard.setText(self._selection_cursor.selectedText())
-            elif event.key() == Qt.Key_B:         # Break Terminal - sent "Start Of Text"
+            elif event.key() == Qt.Key_B:  # Break Terminal - sent "Start Of Text"
                 self.send_text(SOH)
-            elif event.key() == Qt.Key_C:         # Break Terminal - sent "End of Text"
+            elif event.key() == Qt.Key_C:  # Break Terminal - sent "End of Text"
                 self.send_text(ETX)
-            elif event.key() == Qt.Key_D:         # Close Connection - sent "End of Transmission"
+            elif event.key() == Qt.Key_D:  # Close Connection - sent "End of Transmission"
                 self.send_text(EOT)
-            elif event.key() == Qt.Key_E:         # Sent "Enquiry"
+            elif event.key() == Qt.Key_E:  # Sent "Enquiry"
                 self.send_text(ENQ)
-            elif event.key() == Qt.Key_F:         # Sent " Acknowledge"
+            elif event.key() == Qt.Key_F:  # Sent " Acknowledge"
                 self.send_text(ACK)
-            elif event.key() == Qt.Key_G:         # Sent "Bell"
+            elif event.key() == Qt.Key_G:  # Sent "Bell"
                 self.send_text(BEL)
-            elif event.key() == Qt.Key_Z:         # Suspend Terminal - Send "Substitute"
+            elif event.key() == Qt.Key_Z:  # Suspend Terminal - Send "Substitute"
                 self.send_text(SUB)
             return
 
@@ -214,17 +220,17 @@ class QTerminal(QTextEdit):
     def print_data(self, data):
         for char_i in data:
             # Decode ASCII character
-            if char_i == BEL:    # Beep
+            if char_i == BEL:  # Beep
                 self._app.beep()
 
-            elif char_i == BS:   # Backspace
+            elif char_i == BS:  # Backspace
                 if not self._application_cursor_mode:
                     cursor = self.textCursor()
                     cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor)
                     cursor.setCharFormat(self.currentCharFormat())
                     self.setTextCursor(cursor)
 
-            elif str(char_i):    # Normal characters
+            elif str(char_i):  # Normal characters
                 # Replace the existing character
                 cursor = self.textCursor()
                 cursor.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor)
@@ -260,7 +266,7 @@ class QTerminal(QTextEdit):
             The default count is 1.
             """
             if pattern:
-                if pattern.group()[-1] == 'A':    # Move Cursor Up
+                if pattern.group()[-1] == 'A':  # Move Cursor Up
                     action = QTextCursor.Up
                 elif pattern.group()[-1] == 'B':  # Move Cursor Down
                     action = QTextCursor.Down
@@ -301,7 +307,8 @@ class QTerminal(QTextEdit):
                         row = int(row_col.split(';')[0])
                         col = int(row_col.split(';')[1])
                         cursor.movePosition(QTextCursor.Up, QTextCursor.MoveAnchor, row)
-                        cursor.movePosition(QTextCursor.PreviousCharacter, QTextCursor.MoveAnchor, col)
+                        cursor.movePosition(QTextCursor.PreviousCharacter, QTextCursor.MoveAnchor,
+                                            col)
                     except ValueError:
                         print("Receiving non-integer value for escape sequence.")
                 else:
@@ -315,16 +322,17 @@ class QTerminal(QTextEdit):
 
         # Decode escape characters
         if ESC in data:
-            if data.startswith(CSI):        # CSI Codes ( ESC + [ )
+            if data.startswith(CSI):  # CSI Codes ( ESC + [ )
                 """ Moving Cursor Patterns """
-                data = moving_cursor(data, match("%s\d*[ABCDEF]" % rCSI, data))   # pattern = <ESC>[{value} A|B|C|D|E|F
+                data = moving_cursor(data, match("%s\d*[ABCDEF]" % rCSI,
+                                                 data))  # pattern = <ESC>[{value} A|B|C|D|E|F
 
                 # Move Cursor Position [row;column] (default = [1,1])
-                data = moving_cursor_to_pos(data, match("%s(\d+;\d+)?H" % rCSI, data))   # pattern = <ESC>[{value};{value}H
-
+                data = moving_cursor_to_pos(data, match("%s(\d+;\d+)?H" % rCSI,
+                                                        data))  # pattern = <ESC>[{value};{value}H
                 """ Changing cursor mode """
                 # Set cursor key to application mode
-                matched_pattern = match("%s\?1h" % rCSI, data)   # pattern = <ESC>[?1h
+                matched_pattern = match("%s\?1h" % rCSI, data)  # pattern = <ESC>[?1h
                 if matched_pattern:
                     print(matched_pattern.group())
                     data = sub("%s\?1h" % rCSI, '', data)
@@ -335,10 +343,9 @@ class QTerminal(QTextEdit):
                 if matched_pattern:
                     data = sub("%s\?1l" % rCSI, '', data)
                     self._application_cursor_mode = False
-
                 """ Erase Patterns """
                 # Text Erase in Display
-                matched_pattern = match("%s\d*J" % rCSI, data)   # pattern = <ESC>[{value}J
+                matched_pattern = match("%s\d*J" % rCSI, data)  # pattern = <ESC>[{value}J
                 if matched_pattern:
                     data = sub("%s\d*J" % rCSI, '', data)
                     matched_code = matched_pattern.group()[2:-1]
@@ -363,7 +370,7 @@ class QTerminal(QTextEdit):
                         cursor.removeSelectedText()
 
                 # Text Erase in Line (EL)
-                matched_pattern = match("%s\d?K" % rCSI, data)     # pattern = <ESC>[{value}K
+                matched_pattern = match("%s\d?K" % rCSI, data)  # pattern = <ESC>[{value}K
                 if matched_pattern:
                     data = sub("%s\d?K" % rCSI, '', data)
                     matched_code = matched_pattern.group()[2:-1]
@@ -388,7 +395,8 @@ class QTerminal(QTextEdit):
                         cursor.removeSelectedText()
 
                 # Text Graphical Format
-                matched_pattern = match("%s(\d+;?)+m" % rCSI, data)      # pattern = <ESC>[{value};{value}m
+                matched_pattern = match("%s(\d+;?)+m" % rCSI,
+                                        data)  # pattern = <ESC>[{value};{value}m
                 if matched_pattern:
                     data = data[len(matched_pattern.group()):]
                     matched_code = finditer('\d+', matched_pattern.group())
@@ -396,13 +404,14 @@ class QTerminal(QTextEdit):
                         for code in matched_code:
                             text_format = self.update_text_format(int(code.group()), text_format)
 
-            elif data.startswith(OSC):      # OSC Codes ( ESC + ] )
+            elif data.startswith(OSC):  # OSC Codes ( ESC + ] )
                 # Update Terminal Title
-                matched_pattern = match("%s\d+;.*(%s|%s)" % (rOSC, BEL, rST), data)   # pattern = <ESC>]{value};{string} + ST|BEL
+                matched_pattern = match("%s\d+;.*(%s|%s)" % (rOSC, BEL, rST),
+                                        data)  # pattern = <ESC>]{value};{string} + ST|BEL
                 if matched_pattern:
                     data = data[len(matched_pattern.group()):]
                     matched_code = str(findall('\d+', matched_pattern.group())[0])
-                    if matched_code in '02':    # Ignore all other codes
+                    if matched_code in '02':  # Ignore all other codes
                         self.set_title(matched_pattern.group()[4:-1])
 
             else:
@@ -428,88 +437,88 @@ class QTerminal(QTextEdit):
         default_format = self.default_text_format()
 
         # Text attributes
-        if code == 0:                                      # Default
+        if code == 0:  # Default
             text_format = default_format
-        elif code == 1:                                    # Bold
+        elif code == 1:  # Bold
             text_format.setFontWeight(QFont.Bold)
-        elif code == 2:                                    # Low Intensity
+        elif code == 2:  # Low Intensity
             text_format.setFontWeight(QFont.Light)
-        elif code == 3:                                    # Italic
+        elif code == 3:  # Italic
             text_format.setFontItalic(True)
-        elif code == 4:                                    # Underline
+        elif code == 4:  # Underline
             text_format.setUnderlineStyle(QTextCharFormat.SingleUnderline)
             text_format.setFontUnderline(True)
-        elif code == 5:                                    # Blink, Appears as Bold
+        elif code == 5:  # Blink, Appears as Bold
             text_format.setFontWeight(QFont.Bold)
-        elif code == 6:                                    # Blink, Appears as Very Bold
+        elif code == 6:  # Blink, Appears as Very Bold
             text_format.setFontWeight(QFont.Black)
-        elif code == 7:                                    # Reverse/Inverse
+        elif code == 7:  # Reverse/Inverse
             foreground_color = text_format.foreground()
             text_format.setForeground(text_format.background())
             text_format.setBackground(foreground_color)
-        elif code == 8:                                    # Hidden/Invisible (for password)
+        elif code == 8:  # Hidden/Invisible (for password)
             text_format.setForeground(text_format.background())
-        elif code == 9:                                    # Crossed-out
+        elif code == 9:  # Crossed-out
             text_format.setFontStrikeOut(True)
-        elif code == 21:                                   # Bold OFF
+        elif code == 21:  # Bold OFF
             text_format.setFontWeight(QFont.Normal)
-        elif code == 22:                                   # Faint OFF
+        elif code == 22:  # Faint OFF
             text_format.setFontWeight(QFont.Normal)
-        elif code == 23:                                   # Italic OFF
+        elif code == 23:  # Italic OFF
             text_format.setFontItalic(False)
-        elif code == 24:                                   # Underline OFF
+        elif code == 24:  # Underline OFF
             text_format.setUnderlineStyle(QTextCharFormat.NoUnderline)
             text_format.setFontUnderline(False)
-        elif code == 25:                                   # Steady (Not Blinking/Bold)
+        elif code == 25:  # Steady (Not Blinking/Bold)
             text_format.setFontWeight(QFont.Normal)
-        elif code == 27:                                   # Positive (non-inverted)
+        elif code == 27:  # Positive (non-inverted)
             foreground_color = text_format.foreground()
             text_format.setForeground(text_format.background())
             text_format.setBackground(foreground_color)
-        elif code == 28:                                   # Visible (not hidden)
+        elif code == 28:  # Visible (not hidden)
             text_format.setForeground(default_format.foreground())
             text_format.setBackground(default_format.background())
-        elif code == 29:                                   # Crossed-out OFF
+        elif code == 29:  # Crossed-out OFF
             text_format.setFontStrikeOut(False)
 
         # Foreground colors
-        elif code == 30:                                   # Foreground Black
+        elif code == 30:  # Foreground Black
             text_format.setForeground(Qt.black)
-        elif code == 31:                                   # Foreground Red
+        elif code == 31:  # Foreground Red
             text_format.setForeground(Qt.red)
-        elif code == 32:                                   # Foreground Green
+        elif code == 32:  # Foreground Green
             text_format.setForeground(Qt.green)
-        elif code == 33:                                   # Foreground Yellow
+        elif code == 33:  # Foreground Yellow
             text_format.setForeground(Qt.yellow)
-        elif code == 34:                                   # Foreground Blue
+        elif code == 34:  # Foreground Blue
             text_format.setForeground(Qt.blue)
-        elif code == 35:                                   # Foreground Magenta
+        elif code == 35:  # Foreground Magenta
             text_format.setForeground(Qt.magenta)
-        elif code == 36:                                   # Foreground Cyan
+        elif code == 36:  # Foreground Cyan
             text_format.setForeground(Qt.cyan)
-        elif code == 37:                                   # Foreground White
+        elif code == 37:  # Foreground White
             text_format.setForeground(Qt.white)
-        elif code == 39:                                   # Foreground Default
+        elif code == 39:  # Foreground Default
             text_format.setForeground(default_format.foreground())
 
         # Background colors
-        elif code == 40:                                   # Background Black
+        elif code == 40:  # Background Black
             text_format.setBackground(Qt.black)
-        elif code == 41:                                   # Background Red
+        elif code == 41:  # Background Red
             text_format.setBackground(Qt.red)
-        elif code == 42:                                   # Background Green
+        elif code == 42:  # Background Green
             text_format.setBackground(Qt.green)
-        elif code == 43:                                   # Background Yellow
+        elif code == 43:  # Background Yellow
             text_format.setBackground(Qt.yellow)
-        elif code == 44:                                   # Background Blue
+        elif code == 44:  # Background Blue
             text_format.setBackground(Qt.blue)
-        elif code == 45:                                   # Background Magenta
+        elif code == 45:  # Background Magenta
             text_format.setBackground(Qt.magenta)
-        elif code == 46:                                   # Background Cyan
+        elif code == 46:  # Background Cyan
             text_format.setBackground(Qt.cyan)
-        elif code == 47:                                   # Background White
+        elif code == 47:  # Background White
             text_format.setBackground(Qt.white)
-        elif code == 49:                                   # Background Default
+        elif code == 49:  # Background Default
             text_format.setBackground(default_format.background())
         else:
             pass

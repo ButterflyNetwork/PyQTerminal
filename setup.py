@@ -17,7 +17,6 @@ setup(
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version='1.0.0',
-
     description='A Terminal Interface that is based on QPlainTextEdit)',
     long_description=long_description,
 
@@ -81,7 +80,6 @@ setup(
         'dev': ['check-manifest'],
         'test': ['coverage'],
     },
-
     python_requires='>=3',
 
     # If there are data files included in your packages that need to be
