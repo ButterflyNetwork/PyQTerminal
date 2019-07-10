@@ -14,6 +14,7 @@ class QTerminal(QTextEdit):
     SCREEN_HEIGHT = 24
     SCREEN_WIDTH = 80
     FONT_NAME = "Lucida Console"
+    FONT_SIZE = 10
     FG_COLOR = QColor(100, 100, 100)
     BG_COLOR = QColor(255, 255, 255)
     SELECT_FG_COLOR = QColor(255, 255, 255)
@@ -38,7 +39,7 @@ class QTerminal(QTextEdit):
         # Update the GUI
         self._application_cursor_mode = False
         self._application_keypad_mode = False
-        self.font = QFont(self.FONT_NAME, 10)
+        self.font = QFont(self.FONT_NAME, self.FONT_SIZE)
         self.setFont(self.font)
         self.document().setMaximumBlockCount(self.MAX_OUTPUT)
         self.setCurrentCharFormat(self.default_text_format())  # Reset the text format
