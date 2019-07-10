@@ -218,6 +218,27 @@ class QTerminal(QTextEdit):
             self.copy()
 
     def print_data(self, data):
+        if BEL in data or BS in data:
+            self._print_per_char(data)
+        else:
+            self._print_bulk(data)
+
+    def _print_bulk(self, data):
+        partitioned = str(data).partition("\n")
+
+        cursor = self.textCursor()
+        cursor.setCharFormat(self.currentCharFormat())
+
+        for part_i, text in enumerate(partitioned):
+            # The first line might need to overwrite some characters.
+            if part_i == 0:
+                cursor.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, n=len(text))
+
+            cursor.insertText(text)
+
+        self.setTextCursor(cursor)
+
+    def _print_per_char(self, data):
         for char_i in data:
             # Decode ASCII character
             if char_i == BEL:  # Beep
