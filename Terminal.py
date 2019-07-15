@@ -228,13 +228,13 @@ class QTerminal(QTextEdit):
         partitioned = str(data).partition("\n")
 
         cursor = self.textCursor()
-        cursor.setCharFormat(self.currentCharFormat())
 
         for part_i, text in enumerate(partitioned):
             # The first line might need to overwrite some characters.
             if part_i == 0:
                 cursor.movePosition(QTextCursor.Right, QTextCursor.KeepAnchor, n=len(text))
 
+            cursor.setCharFormat(self.currentCharFormat())
             cursor.insertText(text)
 
         self.setTextCursor(cursor)
